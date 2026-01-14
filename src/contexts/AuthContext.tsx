@@ -115,34 +115,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signIn = async (username: string, password: string) => {
-    // First, look up the email by username
+    // Look up the email by username from profiles table
     const { data: profileData, error: lookupError } = await supabase
       .from("profiles")
-      .select("user_id")
+      .select("email")
       .eq("username", username)
       .maybeSingle();
 
-    if (lookupError || !profileData) {
+    if (lookupError || !profileData?.email) {
       return { error: new Error("Invalid username or password") };
     }
 
-    // Get the user's email from auth.users via admin lookup isn't possible,
-    // so we need to store email in profiles or use a different approach
-    // For now, we'll use a workaround: try to get user email from auth
-    const { data: userData } = await supabase.auth.admin?.getUserById?.(profileData.user_id) || {};
-    
-    // Since we can't access admin API from client, we need to store email in profiles
-    // Let's use a database function approach - for now, construct email pattern
-    // Actually, the best approach is to query with service role or store email
-    
-    // Workaround: Look up via RPC or use the username as identifier
-    // For simplicity, we'll need to add email to profiles table
-    // But for now, let's try signing in with username@domain pattern won't work
-    
-    // Better solution: Create an edge function to handle username login
-    // For now, return error suggesting we need email storage
     const { error } = await supabase.auth.signInWithPassword({
-      email: username, // This won't work - we need the actual email
+      email: profileData.email,
       password,
     });
 
