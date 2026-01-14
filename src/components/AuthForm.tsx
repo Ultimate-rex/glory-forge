@@ -230,14 +230,28 @@ export const AuthForm = () => {
 
           {/* Social Links */}
           <div className="space-y-2">
-            <Button variant="outline" className="w-full text-success border-success/30 hover:bg-success/10">
-              <MessageCircle className="w-4 h-4 mr-2" />
-              WhatsApp
-            </Button>
-            <Button variant="outline" className="w-full text-basic border-basic/30 hover:bg-basic/10">
-              <Send className="w-4 h-4 mr-2" />
-              Telegram
-            </Button>
+            <a 
+              href="https://t.me/glxsyy_akash" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="w-full"
+            >
+              <Button variant="outline" className="w-full text-success border-success/30 hover:bg-success/10">
+                <MessageCircle className="w-4 h-4 mr-2" />
+                WhatsApp
+              </Button>
+            </a>
+            <a 
+              href="https://t.me/ff_glory_pro" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="w-full"
+            >
+              <Button variant="outline" className="w-full text-basic border-basic/30 hover:bg-basic/10">
+                <Send className="w-4 h-4 mr-2" />
+                Telegram
+              </Button>
+            </a>
           </div>
         </div>
       </div>
