@@ -1,26 +1,26 @@
-import { useState } from "react";
 import { AuthForm } from "@/components/AuthForm";
 import { Dashboard } from "@/components/Dashboard";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [username, setUsername] = useState("");
+  const { user, isLoading } = useAuth();
 
-  const handleLogin = (user: string) => {
-    setUsername(user);
-    setIsLoggedIn(true);
-  };
-
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    setUsername("");
-  };
-
-  if (!isLoggedIn) {
-    return <AuthForm onLogin={handleLogin} />;
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="w-12 h-12 rounded-full border-4 border-primary border-t-transparent animate-spin mx-auto" />
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
   }
 
-  return <Dashboard username={username} onLogout={handleLogout} />;
+  if (!user) {
+    return <AuthForm />;
+  }
+
+  return <Dashboard />;
 };
 
 export default Index;
