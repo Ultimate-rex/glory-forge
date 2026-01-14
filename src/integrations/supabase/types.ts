@@ -19,6 +19,7 @@ export type Database = {
           basic_credits: number
           binance_id: string | null
           created_at: string
+          email: string | null
           id: string
           premium_credits: number
           updated_at: string
@@ -29,6 +30,7 @@ export type Database = {
           basic_credits?: number
           binance_id?: string | null
           created_at?: string
+          email?: string | null
           id?: string
           premium_credits?: number
           updated_at?: string
@@ -39,6 +41,7 @@ export type Database = {
           basic_credits?: number
           binance_id?: string | null
           created_at?: string
+          email?: string | null
           id?: string
           premium_credits?: number
           updated_at?: string
