@@ -16,7 +16,7 @@ const signUpSchema = z.object({
 });
 
 const signInSchema = z.object({
-  email: z.string().email("Invalid email address"),
+  username: z.string().min(3, "Username must be at least 3 characters"),
   password: z.string().min(1, "Password is required"),
 });
 
@@ -62,7 +62,7 @@ export const AuthForm = () => {
         }
         toast.success("Account created successfully! You are now logged in.");
       } else {
-        const result = signInSchema.safeParse({ email, password });
+        const result = signInSchema.safeParse({ username, password });
         if (!result.success) {
           const fieldErrors: Record<string, string> = {};
           result.error.errors.forEach((err) => {
@@ -75,7 +75,7 @@ export const AuthForm = () => {
           return;
         }
 
-        const { error } = await signIn(email, password);
+        const { error } = await signIn(username, password);
         if (error) {
           if (error.message.includes("Invalid login")) {
             toast.error("Invalid email or password");
@@ -164,20 +164,37 @@ export const AuthForm = () => {
               </div>
             )}
 
-            <div className="space-y-2">
-              <label className="text-sm text-foreground font-medium">Email</label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  className="input-gaming pl-11"
-                />
+            {isSignUp ? (
+              <div className="space-y-2">
+                <label className="text-sm text-foreground font-medium">Email</label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    className="input-gaming pl-11"
+                  />
+                </div>
+                {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
               </div>
-              {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
-            </div>
+            ) : (
+              <div className="space-y-2">
+                <label className="text-sm text-foreground font-medium">Username</label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <input
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value.toLowerCase())}
+                    placeholder="Enter your username"
+                    className="input-gaming pl-11"
+                  />
+                </div>
+                {errors.username && <p className="text-xs text-destructive">{errors.username}</p>}
+              </div>
+            )}
 
             <div className="space-y-2">
               <label className="text-sm text-foreground font-medium">Password</label>
