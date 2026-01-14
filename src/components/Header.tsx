@@ -1,15 +1,15 @@
-import { Bell, LogOut } from "lucide-react";
+import { Bell, LogOut, Shield } from "lucide-react";
 import { Logo } from "./Logo";
 import { Button } from "./ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 
-interface HeaderProps {
-  username: string;
-  basicCredits: number;
-  premiumCredits: number;
-  onLogout: () => void;
-}
+export const Header = () => {
+  const { profile, isAdmin, signOut } = useAuth();
 
-export const Header = ({ username, basicCredits, premiumCredits, onLogout }: HeaderProps) => {
+  const username = profile?.username ?? "User";
+  const basicCredits = profile?.basic_credits ?? 0;
+  const premiumCredits = profile?.premium_credits ?? 0;
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-md">
       <div className="container flex h-16 items-center justify-between">
@@ -21,8 +21,9 @@ export const Header = ({ username, basicCredits, premiumCredits, onLogout }: Hea
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="hidden md:inline-flex px-3 py-1.5 rounded-lg bg-secondary text-sm text-muted-foreground">
-            {username} (user)
+          <span className="hidden md:inline-flex px-3 py-1.5 rounded-lg bg-secondary text-sm text-muted-foreground items-center gap-2">
+            {isAdmin && <Shield className="w-4 h-4 text-primary" />}
+            {username} ({isAdmin ? "admin" : "user"})
           </span>
           
           <div className="badge-basic">
@@ -40,7 +41,7 @@ export const Header = ({ username, basicCredits, premiumCredits, onLogout }: Hea
             <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-primary animate-pulse" />
           </Button>
 
-          <Button variant="outline" size="sm" onClick={onLogout} className="hidden sm:flex">
+          <Button variant="outline" size="sm" onClick={signOut} className="hidden sm:flex">
             <LogOut className="w-4 h-4 mr-1" />
             Logout
           </Button>

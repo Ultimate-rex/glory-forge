@@ -1,23 +1,96 @@
 import { useState } from "react";
-import { Zap, User, Lock, CheckCircle, MessageCircle, Send } from "lucide-react";
+import { Zap, User, Lock, CheckCircle, MessageCircle, Send, Mail } from "lucide-react";
 import { Button } from "./ui/button";
-import { Logo } from "./Logo";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
+import { z } from "zod";
 
-interface AuthFormProps {
-  onLogin: (username: string) => void;
-}
+const signUpSchema = z.object({
+  username: z.string().min(3, "Username must be at least 3 characters").max(20, "Username must be less than 20 characters").regex(/^[a-z0-9_]+$/, "Lowercase letters, numbers, and underscore only"),
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+});
 
-export const AuthForm = ({ onLogin }: AuthFormProps) => {
+const signInSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(1, "Password is required"),
+});
+
+export const AuthForm = () => {
+  const { signIn, signUp } = useAuth();
   const [isSignUp, setIsSignUp] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (username && password) {
-      onLogin(username);
+    setErrors({});
+    setIsLoading(true);
+
+    try {
+      if (isSignUp) {
+        const result = signUpSchema.safeParse({ username, email, password, confirmPassword });
+        if (!result.success) {
+          const fieldErrors: Record<string, string> = {};
+          result.error.errors.forEach((err) => {
+            if (err.path[0]) {
+              fieldErrors[err.path[0].toString()] = err.message;
+            }
+          });
+          setErrors(fieldErrors);
+          setIsLoading(false);
+          return;
+        }
+
+        const { error } = await signUp(email, password, username);
+        if (error) {
+          if (error.message.includes("already registered")) {
+            toast.error("This email is already registered. Please sign in.");
+          } else {
+            toast.error(error.message);
+          }
+          setIsLoading(false);
+          return;
+        }
+        toast.success("Account created successfully! You are now logged in.");
+      } else {
+        const result = signInSchema.safeParse({ email, password });
+        if (!result.success) {
+          const fieldErrors: Record<string, string> = {};
+          result.error.errors.forEach((err) => {
+            if (err.path[0]) {
+              fieldErrors[err.path[0].toString()] = err.message;
+            }
+          });
+          setErrors(fieldErrors);
+          setIsLoading(false);
+          return;
+        }
+
+        const { error } = await signIn(email, password);
+        if (error) {
+          if (error.message.includes("Invalid login")) {
+            toast.error("Invalid email or password");
+          } else {
+            toast.error(error.message);
+          }
+          setIsLoading(false);
+          return;
+        }
+        toast.success("Welcome back!");
+      }
+    } catch (err) {
+      toast.error("An unexpected error occurred");
     }
+    setIsLoading(false);
   };
 
   return (
@@ -73,21 +146,37 @@ export const AuthForm = ({ onLogin }: AuthFormProps) => {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
+            {isSignUp && (
+              <div className="space-y-2">
+                <label className="text-sm text-foreground font-medium">Username</label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <input
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value.toLowerCase())}
+                    placeholder="choose a username"
+                    className="input-gaming pl-11"
+                  />
+                </div>
+                {errors.username && <p className="text-xs text-destructive">{errors.username}</p>}
+                <p className="text-xs text-muted-foreground">Lowercase letters, numbers, and underscore only</p>
+              </div>
+            )}
+
             <div className="space-y-2">
-              <label className="text-sm text-foreground font-medium">Username</label>
+              <label className="text-sm text-foreground font-medium">Email</label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <input
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder={isSignUp ? "choose a username" : "Enter your username"}
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email"
                   className="input-gaming pl-11"
                 />
               </div>
-              {isSignUp && (
-                <p className="text-xs text-muted-foreground">Lowercase letters, numbers, and underscore only</p>
-              )}
+              {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
             </div>
 
             <div className="space-y-2">
@@ -102,6 +191,7 @@ export const AuthForm = ({ onLogin }: AuthFormProps) => {
                   className="input-gaming pl-11"
                 />
               </div>
+              {errors.password && <p className="text-xs text-destructive">{errors.password}</p>}
               {isSignUp && <p className="text-xs text-muted-foreground">Minimum 6 characters</p>}
             </div>
 
@@ -118,12 +208,13 @@ export const AuthForm = ({ onLogin }: AuthFormProps) => {
                     className="input-gaming pl-11"
                   />
                 </div>
+                {errors.confirmPassword && <p className="text-xs text-destructive">{errors.confirmPassword}</p>}
               </div>
             )}
 
-            <Button type="submit" className="w-full" size="lg">
+            <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
               <User className="w-4 h-4 mr-2" />
-              {isSignUp ? "Create Account" : "Sign In"}
+              {isLoading ? "Please wait..." : isSignUp ? "Create Account" : "Sign In"}
             </Button>
           </form>
 

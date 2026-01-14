@@ -1,38 +1,42 @@
-import { useState } from "react";
 import { Header } from "./Header";
 import { CollapsibleSection } from "./CollapsibleSection";
 import { LaunchGroupForm } from "./LaunchGroupForm";
 import { BuyCreditsSection } from "./BuyCreditsSection";
 import { GiftCouponsSection } from "./GiftCouponsSection";
-import { DollarSign, History, Gift, Clock, RefreshCw } from "lucide-react";
+import { AdminPanel } from "./AdminPanel";
+import { DollarSign, History, Gift, Clock, RefreshCw, Shield } from "lucide-react";
 import { Button } from "./ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 
-interface DashboardProps {
-  username: string;
-  onLogout: () => void;
-}
+export const Dashboard = () => {
+  const { profile, isAdmin, refreshProfile } = useAuth();
 
-export const Dashboard = ({ username, onLogout }: DashboardProps) => {
-  const [basicCredits] = useState(5);
-  const [premiumCredits] = useState(0);
+  const basicCredits = profile?.basic_credits ?? 0;
+  const premiumCredits = profile?.premium_credits ?? 0;
 
   return (
     <div className="min-h-screen pb-8">
-      <Header
-        username={username}
-        basicCredits={basicCredits}
-        premiumCredits={premiumCredits}
-        onLogout={onLogout}
-      />
+      <Header />
 
       <main className="container py-6 space-y-4">
         {/* Refresh Button */}
         <div className="flex justify-start">
-          <Button variant="success" className="gap-2">
+          <Button variant="success" className="gap-2" onClick={refreshProfile}>
             <RefreshCw className="w-4 h-4" />
             Refresh
           </Button>
         </div>
+
+        {/* Admin Panel - Only visible to admins */}
+        {isAdmin && (
+          <CollapsibleSection
+            icon={<Shield className="w-5 h-5" />}
+            title="Admin Control Panel"
+            titleColor="text-primary"
+          >
+            <AdminPanel />
+          </CollapsibleSection>
+        )}
 
         {/* Buy Credits */}
         <CollapsibleSection
