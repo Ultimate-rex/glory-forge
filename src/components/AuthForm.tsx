@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Zap, User, Lock, CheckCircle, MessageCircle, Send, Mail } from "lucide-react";
+import { Zap, User, Lock, CheckCircle, MessageCircle, Send } from "lucide-react";
 import { Button } from "./ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -7,7 +7,6 @@ import { z } from "zod";
 
 const signUpSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters").max(20, "Username must be less than 20 characters").regex(/^[a-z0-9_]+$/, "Lowercase letters, numbers, and underscore only"),
-  email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
@@ -25,7 +24,6 @@ export const AuthForm = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -37,7 +35,7 @@ export const AuthForm = () => {
 
     try {
       if (isSignUp) {
-        const result = signUpSchema.safeParse({ username, email, password, confirmPassword });
+        const result = signUpSchema.safeParse({ username, password, confirmPassword });
         if (!result.success) {
           const fieldErrors: Record<string, string> = {};
           result.error.errors.forEach((err) => {
@@ -50,10 +48,12 @@ export const AuthForm = () => {
           return;
         }
 
-        const { error } = await signUp(email, password, username);
+        // Auto-generate email from username
+        const generatedEmail = `${username}@ffglory.app`;
+        const { error } = await signUp(generatedEmail, password, username);
         if (error) {
           if (error.message.includes("already registered")) {
-            toast.error("This email is already registered. Please sign in.");
+            toast.error("This username is already taken. Please try another.");
           } else {
             toast.error(error.message);
           }
@@ -164,22 +164,7 @@ export const AuthForm = () => {
               </div>
             )}
 
-            {isSignUp ? (
-              <div className="space-y-2">
-                <label className="text-sm text-foreground font-medium">Email</label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email"
-                    className="input-gaming pl-11"
-                  />
-                </div>
-                {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
-              </div>
-            ) : (
+            {!isSignUp && (
               <div className="space-y-2">
                 <label className="text-sm text-foreground font-medium">Username</label>
                 <div className="relative">
