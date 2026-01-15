@@ -1,14 +1,19 @@
-import { DollarSign, Minus, Plus, Copy, Check } from "lucide-react";
+import { DollarSign, Copy, Check, Send } from "lucide-react";
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 const BINANCE_ID = "1200028749";
 
 export const BuyCreditsSection = () => {
+  const { user } = useAuth();
   const [basicCredits, setBasicCredits] = useState(0);
   const [premiumCredits, setPremiumCredits] = useState(0);
   const [copied, setCopied] = useState(false);
+  const [transactionId, setTransactionId] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const basicPrice = 1;
   const premiumPrice = 15;
@@ -24,12 +29,58 @@ export const BuyCreditsSection = () => {
 
   const totalAmount = basicCredits * basicPrice + premiumCredits * premiumPrice;
 
-  const handlePayNow = () => {
-    if (totalAmount === 0) {
+  const submitTransaction = async (creditType: "basic" | "premium", credits: number, amount: number) => {
+    if (!user) {
+      toast.error("Please login first");
+      return;
+    }
+
+    const { error } = await supabase.from("transactions").insert({
+      user_id: user.id,
+      transaction_id: transactionId,
+      amount: amount,
+      credits_requested: credits,
+      credit_type: creditType,
+      status: "pending"
+    });
+
+    if (error) {
+      console.error("Transaction error:", error);
+      throw error;
+    }
+  };
+
+  const handleSubmitTransaction = async () => {
+    if (!transactionId.trim()) {
+      toast.error("Please enter your transaction ID");
+      return;
+    }
+
+    if (basicCredits === 0 && premiumCredits === 0) {
       toast.error("Please select at least 1 credit");
       return;
     }
-    toast.success(`Order placed! Pay $${totalAmount.toFixed(2)} to Binance ID: ${BINANCE_ID}`);
+
+    setIsSubmitting(true);
+
+    try {
+      // Submit transactions for each credit type
+      if (basicCredits > 0) {
+        await submitTransaction("basic", basicCredits, basicCredits * basicPrice);
+      }
+      if (premiumCredits > 0) {
+        await submitTransaction("premium", premiumCredits, premiumCredits * premiumPrice);
+      }
+
+      toast.success("Transaction submitted! Admin will verify and add credits shortly.");
+      setTransactionId("");
+      setBasicCredits(0);
+      setPremiumCredits(0);
+    } catch (error) {
+      toast.error("Failed to submit transaction. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -44,7 +95,7 @@ export const BuyCreditsSection = () => {
 
       {/* Binance Pay Info */}
       <div className="p-4 rounded-lg border border-premium/30 bg-premium/5">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-2">
           <div>
             <p className="text-sm font-medium text-foreground">💳 Pay via Binance Pay</p>
             <p className="text-xs text-muted-foreground mt-1">Send payment to this Binance ID:</p>
@@ -150,6 +201,24 @@ export const BuyCreditsSection = () => {
         </div>
       </div>
 
+      {/* Transaction ID Input */}
+      <div className="p-4 rounded-lg border border-success/30 bg-success/5 space-y-3">
+        <label className="text-sm font-medium text-foreground flex items-center gap-2">
+          <Send className="w-4 h-4 text-success" />
+          Transaction ID
+        </label>
+        <input
+          type="text"
+          value={transactionId}
+          onChange={(e) => setTransactionId(e.target.value)}
+          placeholder="Enter your Binance transaction ID after payment"
+          className="input-gaming"
+        />
+        <p className="text-xs text-muted-foreground">
+          After sending payment, paste the transaction ID here for verification
+        </p>
+      </div>
+
       {/* Order Summary */}
       <div className="p-4 rounded-lg border border-border space-y-3">
         <h4 className="font-semibold text-foreground flex items-center gap-2">
@@ -170,9 +239,14 @@ export const BuyCreditsSection = () => {
             <span className="text-success text-lg">${totalAmount.toFixed(2)}</span>
           </div>
         </div>
-        <Button variant="success" className="w-full mt-4" onClick={handlePayNow}>
+        <Button 
+          variant="success" 
+          className="w-full mt-4" 
+          onClick={handleSubmitTransaction}
+          disabled={isSubmitting || !transactionId.trim() || (basicCredits === 0 && premiumCredits === 0)}
+        >
           <DollarSign className="w-4 h-4 mr-2" />
-          Pay Now via Binance
+          {isSubmitting ? "Submitting..." : "Submit Transaction for Verification"}
         </Button>
       </div>
     </div>
