@@ -1,9 +1,12 @@
+import { useState } from "react";
 import { AuthForm } from "@/components/AuthForm";
 import { Dashboard } from "@/components/Dashboard";
+import { LandingPage } from "@/components/LandingPage";
 import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
   const { user, isLoading } = useAuth();
+  const [showAuth, setShowAuth] = useState(false);
 
   if (isLoading) {
     return (
@@ -16,11 +19,15 @@ const Index = () => {
     );
   }
 
-  if (!user) {
-    return <AuthForm />;
+  if (user) {
+    return <Dashboard />;
   }
 
-  return <Dashboard />;
+  if (showAuth) {
+    return <AuthForm onBack={() => setShowAuth(false)} />;
+  }
+
+  return <LandingPage onGetStarted={() => setShowAuth(true)} />;
 };
 
 export default Index;

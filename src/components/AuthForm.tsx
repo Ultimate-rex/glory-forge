@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Zap, User, Lock, CheckCircle, MessageCircle, Send } from "lucide-react";
+import { Zap, User, Lock, CheckCircle, MessageCircle, Send, ArrowLeft } from "lucide-react";
 import { Button } from "./ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -19,7 +19,11 @@ const signInSchema = z.object({
   password: z.string().min(1, "Password is required"),
 });
 
-export const AuthForm = () => {
+interface AuthFormProps {
+  onBack?: () => void;
+}
+
+export const AuthForm = ({ onBack }: AuthFormProps) => {
   const { signIn, signUp } = useAuth();
   const [isSignUp, setIsSignUp] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -96,6 +100,15 @@ export const AuthForm = () => {
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md">
+        {onBack && (
+          <button 
+            onClick={onBack} 
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground mb-4 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Home
+          </button>
+        )}
         <div className="card-gaming-bordered p-8 space-y-6">
           {/* Logo */}
           <div className="flex flex-col items-center gap-4">

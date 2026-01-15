@@ -4,6 +4,7 @@ import { LaunchGroupForm } from "./LaunchGroupForm";
 import { BuyCreditsSection } from "./BuyCreditsSection";
 import { GiftCouponsSection } from "./GiftCouponsSection";
 import { AdminPanel } from "./AdminPanel";
+import { TransactionAdminPanel } from "./TransactionAdminPanel";
 import { DollarSign, History, Gift, Clock, RefreshCw, Shield } from "lucide-react";
 import { Button } from "./ui/button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -34,7 +35,10 @@ export const Dashboard = () => {
             title="Admin Control Panel"
             titleColor="text-primary"
           >
-            <AdminPanel />
+            <div className="space-y-4">
+              <TransactionAdminPanel />
+              <AdminPanel />
+            </div>
           </CollapsibleSection>
         )}
 
