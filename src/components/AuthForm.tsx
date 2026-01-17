@@ -64,7 +64,19 @@ export const AuthForm = ({ onBack }: AuthFormProps) => {
           setIsLoading(false);
           return;
         }
-        toast.success("Account created successfully! You are now logged in.");
+
+        // Ensure the user is logged in immediately after signup
+        const { error: loginError } = await signIn(username, password);
+        if (loginError) {
+          toast.success("Account created. Please sign in.");
+          setIsSignUp(false);
+          setPassword("");
+          setConfirmPassword("");
+          setIsLoading(false);
+          return;
+        }
+
+        toast.success("Account created successfully!");
       } else {
         const result = signInSchema.safeParse({ username, password });
         if (!result.success) {
@@ -81,11 +93,7 @@ export const AuthForm = ({ onBack }: AuthFormProps) => {
 
         const { error } = await signIn(username, password);
         if (error) {
-          if (error.message.includes("Invalid login")) {
-            toast.error("Invalid email or password");
-          } else {
-            toast.error(error.message);
-          }
+          toast.error(error.message);
           setIsLoading(false);
           return;
         }

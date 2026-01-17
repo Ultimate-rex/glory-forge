@@ -19,7 +19,7 @@ interface AuthContextType {
   isAdmin: boolean;
   isLoading: boolean;
   signUp: (email: string, password: string, username: string) => Promise<{ error: Error | null }>;
-  signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
+  signIn: (usernameOrEmail: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
   updateCredits: (userId: string, basicCredits: number, premiumCredits: number) => Promise<void>;
@@ -114,24 +114,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return { error: null };
   };
 
-  const signIn = async (username: string, password: string) => {
-    // Look up the email by username from profiles table
-    const { data: profileData, error: lookupError } = await supabase
-      .from("profiles")
-      .select("email")
-      .eq("username", username)
-      .maybeSingle();
-
-    if (lookupError || !profileData?.email) {
-      return { error: new Error("Invalid username or password") };
-    }
+  const signIn = async (usernameOrEmail: string, password: string) => {
+    const identifier = usernameOrEmail.trim().toLowerCase();
+    const email = identifier.includes("@") ? identifier : `${identifier}@ffglory.app`;
 
     const { error } = await supabase.auth.signInWithPassword({
-      email: profileData.email,
+      email,
       password,
     });
 
-    return { error };
+    // Don't leak whether the username exists
+    if (error) {
+      return { error: new Error("Invalid username or password") };
+    }
+
+    return { error: null };
   };
 
   const signOut = async () => {
