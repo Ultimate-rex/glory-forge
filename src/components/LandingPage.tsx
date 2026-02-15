@@ -28,7 +28,7 @@ export const LandingPage = ({ onGetStarted }: LandingPageProps) => {
             <button onClick={() => scrollToSection("pricing")} className="text-sm text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wide">Pricing</button>
             <button onClick={() => scrollToSection("reviews")} className="text-sm text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wide">Reviews</button>
           </nav>
-          <Button onClick={onGetStarted} className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-6">
+          <Button onClick={onGetStarted} className="bg-gradient-primary hover:opacity-90 text-white font-semibold px-6">
             DASHBOARD
           </Button>
         </div>
@@ -39,7 +39,7 @@ export const LandingPage = ({ onGetStarted }: LandingPageProps) => {
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <h1 className="font-display text-4xl md:text-6xl font-bold mb-6">
-            Dominate Your <span className="text-primary">Clan Glory</span>
+            Dominate Your <span className="text-gradient-primary">Clan Glory</span>
             <br />Automatically
           </h1>
           <p className="text-muted-foreground text-lg md:text-xl mb-8 max-w-2xl mx-auto">
@@ -63,7 +63,7 @@ export const LandingPage = ({ onGetStarted }: LandingPageProps) => {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button onClick={onGetStarted} className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-6 text-lg">
+            <Button onClick={onGetStarted} className="bg-gradient-primary hover:opacity-90 text-white font-semibold px-8 py-6 text-lg">
               <Zap className="w-5 h-5 mr-2" />
               GET STARTED NOW
             </Button>
@@ -114,12 +114,42 @@ export const LandingPage = ({ onGetStarted }: LandingPageProps) => {
         </div>
       </section>
 
+      {/* Features */}
+      <section id="features" className="py-20 px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-semibold uppercase tracking-wide mb-4">Features</span>
+            <h2 className="font-display text-3xl md:text-5xl font-bold">Why Choose <span className="text-gradient-primary">Glory Bot?</span></h2>
+            <p className="text-muted-foreground mt-4">Experience the most powerful and reliable clan glory automation system built for serious players.</p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            {[
+              { icon: "🤖", title: "Smart Automation", desc: "Our intelligent bots work 24/7 to maximize your clan glory earnings with optimized strategies and minimal resource usage.", gradient: "from-orange-500 to-yellow-500" },
+              { icon: "📊", title: "Real-Time Dashboard", desc: "Monitor your glory progress, bot status, and earnings in real-time through our intuitive web dashboard.", gradient: "from-purple-500 to-pink-500" },
+              { icon: "🌍", title: "Multi-Region Support", desc: "Support for all major regions including Middle East, India, Bangladesh, and more. Play from anywhere in the world.", gradient: "from-yellow-500 to-orange-500" },
+              { icon: "🔒", title: "Secure & Safe", desc: "Advanced security measures ensure your account safety. We use encrypted connections and secure authentication.", gradient: "from-green-500 to-teal-500" },
+              { icon: "💰", title: "Credit System", desc: "Flexible credit-based system lets you control your usage. Get refunds for unsuccessful sessions automatically.", gradient: "from-orange-500 to-red-500" },
+              { icon: "🛟", title: "24/7 Support", desc: "Our dedicated support team is always ready to help you with any questions or issues you might encounter.", gradient: "from-amber-500 to-orange-500" },
+            ].map((feature, i) => (
+              <div key={i} className="card-gaming-bordered p-6 hover:border-primary/30 transition-colors">
+                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center text-xl mb-4`}>
+                  {feature.icon}
+                </div>
+                <h3 className="font-display text-lg font-bold mb-2">{feature.title}</h3>
+                <p className="text-sm text-muted-foreground">{feature.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* How It Works */}
       <section id="how-it-works" className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-semibold uppercase tracking-wide mb-4">Process</span>
-            <h2 className="font-display text-3xl md:text-5xl font-bold">How It <span className="text-primary">Works</span></h2>
+            <h2 className="font-display text-3xl md:text-5xl font-bold">How It <span className="text-gradient-primary">Works</span></h2>
             <p className="text-muted-foreground mt-4">Get started with Glory Bot in just a few simple steps.</p>
           </div>
 
@@ -160,7 +190,7 @@ export const LandingPage = ({ onGetStarted }: LandingPageProps) => {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-semibold uppercase tracking-wide mb-4">Pricing</span>
-            <h2 className="font-display text-3xl md:text-5xl font-bold">Simple <span className="text-primary">Pricing</span></h2>
+            <h2 className="font-display text-3xl md:text-5xl font-bold">Simple <span className="text-gradient-primary">Pricing</span></h2>
             <p className="text-muted-foreground mt-4">Choose the plan that fits your needs. No hidden fees, cancel anytime.</p>
           </div>
 
@@ -188,7 +218,7 @@ export const LandingPage = ({ onGetStarted }: LandingPageProps) => {
                 ))}
               </div>
               
-              <Button onClick={onGetStarted} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-6">
+              <Button onClick={onGetStarted} className="w-full bg-gradient-primary hover:opacity-90 text-white font-semibold py-6">
                 GET STARTED
               </Button>
             </div>
@@ -201,7 +231,7 @@ export const LandingPage = ({ onGetStarted }: LandingPageProps) => {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-semibold uppercase tracking-wide mb-4">Testimonials</span>
-            <h2 className="font-display text-3xl md:text-5xl font-bold">What Players <span className="text-primary">Say</span></h2>
+            <h2 className="font-display text-3xl md:text-5xl font-bold">What Players <span className="text-gradient-primary">Say</span></h2>
             <p className="text-muted-foreground mt-4">Join thousands of satisfied clan leaders who trust Glory Bot.</p>
           </div>
 
@@ -257,7 +287,7 @@ export const LandingPage = ({ onGetStarted }: LandingPageProps) => {
             <div className="relative z-10">
               <h2 className="font-display text-3xl md:text-4xl font-bold mb-4">Ready to Dominate the Leaderboards?</h2>
               <p className="text-muted-foreground mb-8 max-w-lg mx-auto">Join thousands of clan leaders who are already using Glory Bot to maximize their clan's potential.</p>
-              <Button onClick={onGetStarted} className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-6 text-lg">
+              <Button onClick={onGetStarted} className="bg-gradient-primary hover:opacity-90 text-white font-semibold px-8 py-6 text-lg">
                 <Trophy className="w-5 h-5 mr-2" />
                 START YOUR JOURNEY NOW
               </Button>
