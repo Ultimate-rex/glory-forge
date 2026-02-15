@@ -3,9 +3,9 @@ import { CollapsibleSection } from "./CollapsibleSection";
 import { LaunchGroupForm } from "./LaunchGroupForm";
 import { BuyCreditsSection } from "./BuyCreditsSection";
 import { GiftCouponsSection } from "./GiftCouponsSection";
-import { AdminPanel } from "./AdminPanel";
-import { TransactionAdminPanel } from "./TransactionAdminPanel";
-import { DollarSign, History, Gift, Clock, RefreshCw, Shield } from "lucide-react";
+import { AdminUserManagement } from "./admin/AdminUserManagement";
+import { AdminPaymentPanel } from "./admin/AdminPaymentPanel";
+import { DollarSign, History, Gift, Clock, RefreshCw, Shield, Users, CreditCard } from "lucide-react";
 import { Button } from "./ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -28,17 +28,25 @@ export const Dashboard = () => {
           </Button>
         </div>
 
-        {/* Admin Panel - Only visible to admins */}
+        {/* Admin: User Management - Separate Box */}
         {isAdmin && (
           <CollapsibleSection
-            icon={<Shield className="w-5 h-5" />}
-            title="Admin Control Panel"
-            titleColor="text-primary"
+            icon={<Users className="w-5 h-5" />}
+            title="User Management"
+            titleColor="text-basic"
           >
-            <div className="space-y-4">
-              <TransactionAdminPanel />
-              <AdminPanel />
-            </div>
+            <AdminUserManagement />
+          </CollapsibleSection>
+        )}
+
+        {/* Admin: Payment Confirmations - Separate Box */}
+        {isAdmin && (
+          <CollapsibleSection
+            icon={<CreditCard className="w-5 h-5" />}
+            title="Payment Confirmations"
+            titleColor="text-premium"
+          >
+            <AdminPaymentPanel />
           </CollapsibleSection>
         )}
 
